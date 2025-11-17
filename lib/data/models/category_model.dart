@@ -1,9 +1,9 @@
 class Category {
-  final String? id;
-  final String? name;
-  final String? image;
-  final String? description;
-  final bool? isActive;
+  String? id;
+  String? name;
+  String? image;
+  String? description;
+  bool? isActive;
 
   Category({
     this.id,

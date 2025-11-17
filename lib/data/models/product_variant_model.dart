@@ -1,7 +1,7 @@
 class ProductVariant {
-  final String? color;
-  final String? size;
-  final int? stock;
+  String? color;
+  String? size;
+  int? stock;
 
   ProductVariant({
     this.color,
