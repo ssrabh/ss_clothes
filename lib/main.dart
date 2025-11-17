@@ -1,5 +1,10 @@
-import 'package:female_clothes/screens/home_screen.dart';
+import 'package:female_clothes/core/app_router.dart';
+import 'package:female_clothes/core/app_theme.dart';
+import 'package:female_clothes/provider/category_provider.dart';
+import 'package:female_clothes/provider/home_provider.dart';
+import 'package:female_clothes/provider/product_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,13 +15,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Female Clothes',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        home: HomeScreen());
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => HomeProvider()),
+        ChangeNotifierProvider(create: (_) => CategoryProvider()),
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
+      ],
+      child: Builder(builder: (context) {
+        final router = AppRouter.router;
+        return MaterialApp.router(
+          title: 'Female Clothes',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          routerConfig: router,
+        );
+      }),
+    );
   }
 }

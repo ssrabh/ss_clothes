@@ -1,71 +1,58 @@
-import 'package:female_clothes/widgets/product_widget.dart';
+import 'package:female_clothes/provider/category_provider.dart';
+import 'package:female_clothes/widgets/product_card.dart';
 import 'package:flutter/material.dart';
-import 'package:female_clothes/data/models/category_model.dart';
-import 'package:female_clothes/data/repository/mock_data.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
-class CategoryScreen extends StatelessWidget {
-  final Category category;
+class CategoryScreen extends StatefulWidget {
+  final String categoryId;
+  final String? categoryName;
 
-  const CategoryScreen({super.key, required this.category});
+  const CategoryScreen(
+      {super.key, required this.categoryId, this.categoryName});
+
+  @override
+  State<CategoryScreen> createState() => _CategoryScreenState();
+}
+
+class _CategoryScreenState extends State<CategoryScreen> {
+  @override
+  void initState() {
+    super.initState();
+    final cp = Provider.of<CategoryProvider>(context, listen: false);
+    cp.loadForCategory(widget.categoryId);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final filteredProducts =
-        MockData.products.where((p) => p.categoryId == category.id).toList();
+    return Consumer<CategoryProvider>(builder: (context, cp, _) {
+      final isWide = MediaQuery.of(context).size.width > 700;
+      final cross = isWide ? 3 : 2;
 
-    return Scaffold(
-      appBar: AppBar(title: Text(category.name ?? "")),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // -------- CATEGORY BANNER --------
-          if (category.image != null)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(0),
-              child: Image.network(
-                category.image!,
-                height: 180,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
+      return Scaffold(
+        appBar: AppBar(title: Text(widget.categoryName ?? 'Category')),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16),
+          child: GridView.builder(
+            itemCount: cp.items.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: cross,
+              childAspectRatio: isWide ? 0.78 : 0.68,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
             ),
-
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              "${category.name} Collection",
-              style: Theme.of(context).textTheme.headline6,
-            ),
+            itemBuilder: (context, i) {
+              final p = cp.items[i];
+              return ProductCard(
+                product: p,
+                onTap: () =>
+                    // context.goNamed('product', params: {'id': p.id ?? ''}),
+                    context.push("/category/${p.id}"),
+              );
+            },
           ),
-
-          // -------- PRODUCT GRID --------
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              itemCount: filteredProducts.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: .68,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-              ),
-              itemBuilder: (context, index) {
-                final p = filteredProducts[index];
-                return ProductCard(
-                  product: p,
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ProductDetailScreen(product: p),
-                        ));
-                  },
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+        ),
+      );
+    });
   }
 }
