@@ -1,4 +1,3 @@
-import 'package:female_clothes/data/models/category_model.dart';
 import 'package:female_clothes/provider/home_provider.dart';
 import 'package:female_clothes/widgets/product_card.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
           elevation: 4.0,
           shadowColor: Colors.black.withOpacity(0.2),
           title: Text(
-            'VOGUE BOUTIQUE',
+            'Female clothes',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w900,
                   letterSpacing: 2.0,
