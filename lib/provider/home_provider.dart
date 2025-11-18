@@ -1,5 +1,6 @@
 import 'package:female_clothes/data/models/product_model.dart';
 import 'package:female_clothes/data/repository/mock_data.dart';
+import 'package:female_clothes/provider/filter_provider.dart';
 import 'package:flutter/material.dart';
 
 class HomeProvider extends ChangeNotifier {
@@ -19,6 +20,23 @@ class HomeProvider extends ChangeNotifier {
     categories = MockData.categories;
 
     _isLoading = false;
+    notifyListeners();
+  }
+
+  void applyFilters(FilterProvider fp) {
+    _products = MockData.products.where((p) {
+      bool matchesPrice = (p.salePrice ?? p.price ?? 0) >= fp.minPrice &&
+          (p.salePrice ?? p.price ?? 0) <= fp.maxPrice;
+
+      bool matchesSize =
+          fp.selectedSize == null || (p.sizes ?? []).contains(fp.selectedSize);
+
+      bool matchesColor = fp.selectedColor == null ||
+          (p.colors ?? []).contains(fp.selectedColor);
+
+      return matchesPrice && matchesSize && matchesColor;
+    }).toList();
+
     notifyListeners();
   }
 }

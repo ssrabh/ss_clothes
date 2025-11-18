@@ -1,4 +1,5 @@
 import 'package:female_clothes/screens/category_screen.dart';
+import 'package:female_clothes/screens/filter_screen.dart';
 import 'package:female_clothes/screens/home_screen.dart';
 import 'package:female_clothes/screens/product_detail_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -31,6 +32,11 @@ class AppRouter {
           final id = state.pathParameters['id']!;
           return ProductDetailScreen(productId: id);
         },
+      ),
+
+      GoRoute(
+        path: '/filters',
+        builder: (context, state) => FilterScreen(),
       ),
     ],
   );

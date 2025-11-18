@@ -13,21 +13,65 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  // Removed _isLoading state and all setState calls!
+
   @override
   void initState() {
     super.initState();
-    final pp = Provider.of<ProductProvider>(context, listen: false);
-    pp.loadProductById(widget.productId);
+    // Use WidgetsBinding to ensure context is fully available for navigation/dialogs
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final pp = Provider.of<ProductProvider>(context, listen: false);
+      pp.loadProductById(widget.productId); // Just call the function
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<ProductProvider>(builder: (context, pp, _) {
       final product = pp.product;
-      if (product == null)
-        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      final isLoading = pp.isLoading; // <-- Get loading state from Provider
+
+      // --- Loading State ---
+      if (isLoading || product == null) {
+        return const Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('Fetching exquisite details...',
+                    style: TextStyle(color: Colors.grey)),
+              ],
+            ),
+          ),
+        );
+      }
+
+      // --- Display State ---
       return Scaffold(
-        appBar: AppBar(title: Text(product.name ?? 'Product')),
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: Colors.black),
+          title: AnimatedOpacity(
+            // Use the Provider's loading state to control opacity
+            opacity: isLoading ? 0.0 : 1.0,
+            duration: const Duration(milliseconds: 300),
+            child: Text(
+              product.name ?? 'Product Details',
+              style: const TextStyle(
+                  color: Colors.black, fontWeight: FontWeight.bold),
+            ),
+          ),
+          actions: [
+            IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.shopping_bag_outlined)),
+            const SizedBox(width: 8),
+          ],
+        ),
         body: ProductDetailsWidget(product: product),
       );
     });
